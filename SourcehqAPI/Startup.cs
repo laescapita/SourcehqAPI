@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,17 +10,23 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SourcehqAPI.ConfigurationContext;
 
 namespace SourcehqAPI
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        private const string SettingsFile = "appsettings.json";
+        private const string SourceHQDatabaseConnectionStringKey = "SourcehqData";
+        private const string UtilityDatabaseConnectionStringKey = "Utility";
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration _configuration;
+        //public IConfigurationContext _configurationContext;
+
+        public Startup(IWebHostEnvironment webHostEnvironment)
+        {
+            _configuration = BuildConfiguration(webHostEnvironment);
+        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -53,5 +61,38 @@ namespace SourcehqAPI
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
+
+        public static IConfiguration BuildConfiguration(IWebHostEnvironment webHostEnvironment)
+        {
+            IConfigurationBuilder builder;
+
+            if(webHostEnvironment.IsDevelopment())
+            {
+                builder = new ConfigurationBuilder()
+                    .SetBasePath(webHostEnvironment.ContentRootPath)
+                    .AddJsonFile(SettingsFile, optional: true, reloadOnChange: true)
+                    .AddJsonFile(GetEnvironmentSettingsFileName(webHostEnvironment.EnvironmentName), optional: true)
+                    .AddEnvironmentVariables()
+                    .AddUserSecrets<Program>();
+            }
+            else
+            {
+                builder = new ConfigurationBuilder().AddJsonStream(new MemoryStream());
+            }
+
+            return builder.Build();
+        }
+
+        //public static IConfigurationContext BuildConfigurationContext(IConfuguration configuration)
+        //{
+            //IConfiguration configurationContext = new ConfigurationContext(configuration);
+        //}
+
+        public static string GetEnvironmentSettingsFileName(string environment)
+        {
+            return SettingsFile.Replace(".", $".{environment}.");
+        }
+
+
     }
 }
