@@ -10,28 +10,68 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SourcehqAPI.ConfigurationContext;
 
 namespace SourcehqAPI
 {
     public class Startup
     {
-        private const string SettingsFile = "appsettings.json";
-        private const string SourceHQDatabaseConnectionStringKey = "SourcehqData";
-        private const string UtilityDatabaseConnectionStringKey = "Utility";
-
-        public IConfiguration _configuration;
-        //public IConfigurationContext _configurationContext;
-
-        public Startup(IWebHostEnvironment webHostEnvironment)
+        public IConfiguration Configuration { get; }
+        public Startup(IConfiguration config)
         {
-            _configuration = BuildConfiguration(webHostEnvironment);
+            this.Configuration = config;
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddScoped<ITokenService, TokenService>();
+
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IStockRepository, StockRepository>();
+            //services.AddScoped<IBalanceRepository, BalanceRepository>();
+
+            services.AddIdentityCore<ApplicationUserIdentity>(options =>
+            {
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+            })
+                   .AddUserStore<UserStore>()
+                   .AddDefaultTokenProviders()
+                   .AddSignInManager<SignInManager<ApplicationUserIdentity>>();
+
+            services.AddControllers();
+            services.AddCors();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer
+                (
+                    options =>
+                    {
+                        options.RequireHttpsMetadata = false;
+                        options.SaveToken = true;
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = Configuration["Jwt:Issuer"],
+                            ValidAudience = Configuration["Jwt:Issuer"],
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                            ClockSkew = TimeSpan.Zero
+                        };
+                    }
+                );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,56 +83,33 @@ namespace SourcehqAPI
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                app.UseExceptionHandler("/Error");
             }
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
+
+            app.ConfigureExceptionHandler();
 
             app.UseRouting();
 
+            if (env.IsDevelopment())
+            {
+
+                app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            }
+            else
+            {
+                //Makes it where malicious websites cant make any request to this,
+                //app.UseCors(options => options.WithOrigins("https://ourwebsite.com"))
+                app.UseCors();
+            }
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
         }
-
-        public static IConfiguration BuildConfiguration(IWebHostEnvironment webHostEnvironment)
-        {
-            IConfigurationBuilder builder;
-
-            if(webHostEnvironment.IsDevelopment())
-            {
-                builder = new ConfigurationBuilder()
-                    .SetBasePath(webHostEnvironment.ContentRootPath)
-                    .AddJsonFile(SettingsFile, optional: true, reloadOnChange: true)
-                    .AddJsonFile(GetEnvironmentSettingsFileName(webHostEnvironment.EnvironmentName), optional: true)
-                    .AddEnvironmentVariables()
-                    .AddUserSecrets<Program>();
-            }
-            else
-            {
-                builder = new ConfigurationBuilder().AddJsonStream(new MemoryStream());
-            }
-
-            return builder.Build();
-        }
-
-        //public static IConfigurationContext BuildConfigurationContext(IConfuguration configuration)
-        //{
-            //IConfiguration configurationContext = new ConfigurationContext(configuration);
-        //}
-
-        public static string GetEnvironmentSettingsFileName(string environment)
-        {
-            return SettingsFile.Replace(".", $".{environment}.");
-        }
-
 
     }
 }

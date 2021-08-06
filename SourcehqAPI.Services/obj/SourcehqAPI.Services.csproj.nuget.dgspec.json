@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI\\SourcehqAPI.csproj": {}
+    "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI.Services\\SourcehqAPI.Services.csproj": {}
   },
   "projects": {
-    "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI\\SourcehqAPI.csproj": {
+    "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI.Services\\SourcehqAPI.Services.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI\\SourcehqAPI.csproj",
-        "projectName": "SourcehqAPI",
-        "projectPath": "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI\\SourcehqAPI.csproj",
+        "projectUniqueName": "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI.Services\\SourcehqAPI.Services.csproj",
+        "projectName": "SourcehqAPI.Services",
+        "projectPath": "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI.Services\\SourcehqAPI.Services.csproj",
         "packagesPath": "C:\\Users\\leono\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI\\obj\\",
+        "outputPath": "C:\\Users\\leono\\source\\repos\\SourcehqAPI\\SourcehqAPI.Services\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -40,12 +40,6 @@
       },
       "frameworks": {
         "netcoreapp3.1": {
-          "dependencies": {
-            "Dapper": {
-              "target": "Package",
-              "version": "[2.0.90, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",
@@ -57,9 +51,6 @@
           "assetTargetFallback": true,
           "warn": true,
           "frameworkReferences": {
-            "Microsoft.AspNetCore.App": {
-              "privateAssets": "none"
-            },
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
