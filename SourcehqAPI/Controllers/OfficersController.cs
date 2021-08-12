@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SourcehqAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -14,22 +15,31 @@ namespace SourcehqAPI.Controllers
     {
         // GET: api/<SourcePageController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        [Route("getAllOfficers")]
+        public IEnumerable<OfficerModel> Get()
         {
-            return new string[] { "value1", "value2" };
+            //using var connection = new sqlConnection(connectionString);
+            List<OfficerModel> officer = null; //connection.QueryAll<OfficerModel>().ToList();
+            return officer;
         }
 
         // GET api/<SourcePageController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet]
+        [Route("getOfficer/{id}")]
+        public OfficerModel Get(int id)
         {
-            return "value";
+            //using var connection = new sqlConnection(connectionString);
+            OfficerModel officer = null; //connection.Query<OfficerModel>(o => o.OfficerID == id).FirstOrDefault();
+            return officer;
         }
 
         // POST api/<SourcePageController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        [Route("postOfficer")]
+        public void Post(OfficerModel officer)
         {
+            //using var connection = new sqlConnection(connectionString);
+            //query connection to post 
         }
 
         // PUT api/<SourcePageController>/5
@@ -42,6 +52,8 @@ namespace SourcehqAPI.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            //using var connection = new sqlConnection(connectionString);
+            //query connection to delete 
         }
     }
 }
