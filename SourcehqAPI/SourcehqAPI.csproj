@@ -6,6 +6,9 @@
 
   <ItemGroup>
     <None Remove="Models\NewsModel.cs~RF823f26a.TMP" />
+    <None Remove="Models\OfficerMinutesType.cs~RF8d51a29.TMP" />
+    <None Remove="Models\RobotNewsTypeModel.cs~RF8dd61bb.TMP" />
+    <None Remove="Models\StudentModel.cs~RF8b88d14.TMP" />
   </ItemGroup>
 
   <ItemGroup>
