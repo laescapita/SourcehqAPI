@@ -43,13 +43,15 @@ namespace SourcehqAPI.Controllers
         }
 
         // PUT api/<SourcePageController>/5
-        [HttpPut("{id}")]
+        [HttpPut]
+        [Route("putOfficer")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
         // DELETE api/<SourcePageController>/5
-        [HttpDelete("{id}")]
+        [HttpDelete]
+        [Route("deleteOfficer")]
         public void Delete(int id)
         {
             //using var connection = new sqlConnection(connectionString);
